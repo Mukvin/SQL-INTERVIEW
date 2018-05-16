@@ -1,0 +1,41 @@
+题目描述
+查找最晚入职员工的所有信息
+CREATE TABLE `employees` (
+`emp_no` int(11) NOT NULL,
+`birth_date` date NOT NULL,
+`first_name` varchar(14) NOT NULL,
+`last_name` varchar(16) NOT NULL,
+`gender` char(1) NOT NULL,
+`hire_date` date NOT NULL,
+PRIMARY KEY (`emp_no`));
+输入描述:
+
+无
+
+输出描述:
+
+emp_no  birth_date   first_name last_name gender  hire_date
+
+10008   1958-02-19   Saniya     Kalloufi    M    1994-09-15
+
+示例1
+输入
+无
+输出
+无
+
+
+
+输入语句：
+法一：排序，降序。 
+SELECT * FROM employees ORDER BY hire_date DESC LIMIT 0,1;
+
+LIMIT m,n : 表示从第m+1条开始，取n条数据；
+LIMIT n ： 表示从第0条开始，取n条数据，是limit(0,n)的缩写。
+本题limit 0,1 表示从第（0+1）条数据开始，取一条数据，即取出最晚入职员工。
+
+法二：子查询。 先找出 hire_date 字段的最大值，再把该值当成  employees 表的 hire_date 查询条件。 
+
+SELECT * FROM employees WHERE hire_date = (SELECT MAX(hire_date) FROM employees);
+
+

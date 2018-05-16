@@ -1,0 +1,32 @@
+题目描述
+查找当前薪水(to_date='9999-01-01')排名第二多的员工编号emp_no、薪水salary、last_name以及first_name，不准使用order by
+
+CREATE TABLE `employees` (
+`emp_no` int(11) NOT NULL,
+`birth_date` date NOT NULL,
+`first_name` varchar(14) NOT NULL,
+`last_name` varchar(16) NOT NULL,
+`gender` char(1) NOT NULL,
+`hire_date` date NOT NULL,
+PRIMARY KEY (`emp_no`));
+
+CREATE TABLE `salaries` (
+`emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`from_date`));
+
+解析：
+
+本题做法很多，主要思想为多层SELECT嵌套与MAX()函数结合
+1、先利用MAX()函数找出salaries中当前薪水最高者，即SELECT MAX(salary) FROM salaries WHERE to_date = '9999-01-01'
+2、再利用INNER JOIN连接employees与salaries表，限定条件为【同一员工】e.emp_no = s.emp_no、【当前】s.to_date = '9999-01-01'与【非薪水最高】s.salary NOT IN (SELECT MAX(salary) FROM salaries WHERE to_date = '9999-01-01')
+3、在以上限制条件下找薪水最高者，即为所有员工薪水的次高者 
+
+
+SELECT e.emp_no, MAX(s.salary) AS salary, e.last_name, e.first_name 
+FROM employees AS e INNER JOIN salaries AS s 
+ON e.emp_no = s.emp_no
+WHERE s.to_date = '9999-01-01'
+AND s.salary NOT IN (SELECT MAX(salary) FROM salaries WHERE to_date = '9999-01-01')

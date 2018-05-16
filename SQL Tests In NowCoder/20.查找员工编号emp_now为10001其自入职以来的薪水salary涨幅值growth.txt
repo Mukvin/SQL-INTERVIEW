@@ -1,0 +1,27 @@
+题目描述
+查找员工编号emp_now为10001其自入职以来的薪水salary涨幅值growth
+CREATE TABLE `salaries` (
+`emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`from_date`));
+
+解析：
+法一：
+本题严谨的思路如下：
+1、先分别找到emp_no=10001的员工的第一次工资记录与最后一次工资记录
+2、再将最后一次工资记录减去第一次工资记录得到入职以来salary的涨幅，最后用别名growth代替 
+
+SELECT ( 
+(SELECT salary FROM salaries WHERE emp_no = 10001 ORDER BY to_date DESC LIMIT 1) -
+(SELECT salary FROM salaries WHERE emp_no = 10001 ORDER BY to_date ASC LIMIT 1)
+) AS growth
+
+法二：
+
+本题的另一种解法也能通过测试，但实际上不严谨，只有在员工最后一条工资记录为最大值时成立，如果最后一次的工资调整为降薪，则此思路通不过。具体思路如下：
+1、直接找到emp_no=10001的员工的工资记录，将其最大工资减去最小工资得到涨幅 
+
+SELECT (MAX(salary)-MIN(salary)) AS growth 
+FROM salaries WHERE emp_no = '10001'

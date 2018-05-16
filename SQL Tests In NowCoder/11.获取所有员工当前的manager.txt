@@ -1,0 +1,28 @@
+题目描述
+获取所有员工当前的manager，如果当前的manager是自己的话结果不显示，当前表示to_date='9999-01-01'。
+结果第一列给出当前员工的emp_no,第二列给出其manager对应的manager_no。
+CREATE TABLE `dept_emp` (
+`emp_no` int(11) NOT NULL,
+`dept_no` char(4) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`dept_no`));
+
+CREATE TABLE `dept_manager` (
+`dept_no` char(4) NOT NULL,
+`emp_no` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`dept_no`));
+
+解析：
+
+本题应注意以下三点：
+1、用INNER JOIN连接两张表，因为要输出自己的经理，得知自己与经理的部门要相同，故有限制条件 de.dept_no = dm.dept_no
+2、再用WHERE限制当前员工与当前经理的条件，即 dm.to_date 等于 '9999-01-01' 、de.to_date 等于 '9999-01-01' 、 de.emp_no 不等于dm.emp_no
+3、为了增强代码可读性，将dept_emp用别名de代替，dept_manager用dm代替，最后根据题意将de.emp_no用别名manager_no代替后输出
+
+SELECT de.emp_no, dm.emp_no AS manager_no 
+FROM dept_emp AS de INNER JOIN dept_manager AS dm
+ON de.dept_no = dm.dept_no 
+WHERE dm.to_date = '9999-01-01' AND de.to_date = '9999-01-01' AND de.emp_no <> dm.emp_no
