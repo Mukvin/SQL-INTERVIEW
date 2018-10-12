@@ -1,0 +1,89 @@
+题目描述
+
+ film表
+ 
+字段 			|	说明
+film_id 		|	电影id
+title 			|	电影名称
+description 	|	电影描述信息 
+
+
+    CREATE TABLE IF NOT EXISTS film (
+    film_id smallint(5)  NOT NULL DEFAULT '0',
+    title varchar(255) NOT NULL,
+    description text,
+    PRIMARY KEY (film_id));
+
+	
+category表 
+
+字段 				|		说明
+category_id 		|		电影分类id
+name 				|		电影分类名称
+last_update 		|		电影分类最后更新时间 
+
+
+    CREATE TABLE category  (
+    category_id  tinyint(3)  NOT NULL ,
+    name  varchar(25) NOT NULL, `last_update` timestamp,
+    PRIMARY KEY ( category_id ));
+	
+
+film_category表 
+
+字段 				|		说明
+film_id 			|		电影id
+category_id 		|		电影分类id
+last_update 		|		电影id和分类id对应关系的最后更新时间 
+
+
+    CREATE TABLE film_category  (
+    film_id  smallint(5)  NOT NULL,
+    category_id  tinyint(3)  NOT NULL, `last_update` timestamp);
+
+	
+
+查找描述信息中包括robot的电影对应的分类名称以及电影数目，而且还需要该分类对应电影数量>=5部 
+
+解析：
+
+本题题干有误，相同分类包含的电影数量改成大于等于2个才能通过，主要思想是连接三张表，根据题干给出限定条件即可
+
+1、先用 INNER JOIN 连接 film 和 film_category，限定条件为 f.film_id = fc.film_id，即连接电影id与电影分类id
+
+2、再用 INNER JOIN 连接 category，限定条件为 fc.category_id = c.category_id，即连接电影分类id与电影分类名称
+
+3、添加限定条件 f.description LIKE '%robot%'，即电影描述信息中包含 robot，其中%是字符串通配符
+
+4、最后以电影种类id或电影种类名称分组，且相同电影分类包含的电影数量大于等于2个 
+
+答案：
+
+SELECT c.name AS name, COUNT(c.name) AS amount
+FROM (film AS f INNER JOIN film_category AS fc ON f.film_id = fc.film_id )
+INNER JOIN category AS c
+ON fc.category_id = c.category_id
+WHERE f.description LIKE '%robot%'
+GROUP BY c.name HAVING amount >= 2
+
+
+---------------------------------------Update in 2018/1/6-------------------------------------
+
+看了@聪明的小姐姐的题解，发现原来的思维有误，题目是没问题的，只是当时理解出现偏差，以上代码能通过纯属瞎猫碰见死老鼠，现作更正：
+
+原来的错误在于将描述信息包含 “robot” 的电影数量统计出来后，再对 >=5 作比较。
+
+而题目要表达的意思是先将描述信息包含 “robot” 的电影分类及数量统计出来，再针对每一个分类，在 film_category 总表中该分类下所有电影的数量需要 >=5，最后筛选出满足条件的统计结果输出。
+
+注意，统计出来 “robot” 的电影数量是多少就是多少，与 >=5 没有关系。 
+
+更正后的代码： 
+
+SELECT c.name AS name, COUNT(f.film_id) AS amount
+FROM film AS f, film_category AS fc, category AS c,
+(SELECT category_id FROM film_category GROUP BY category_id HAVING COUNT(category_id) >= 5) AS cc
+WHERE f.description LIKE '%robot%'
+AND f.film_id = fc.film_id
+AND fc.category_id = c.category_id
+AND c.category_id = cc.category_id
+

@@ -1,0 +1,9 @@
+题目描述
+获取select * from employees对应的执行计划
+
+解析：
+
+在SQLite数据库中，可以用 "EXPLAIN" 关键字或 "EXPLAIN QUERY PLAN" 短语，用于描述表的细节，具体说明与用法可参考： 
+
+答案：
+EXPLAIN SELECT * FROM employees

@@ -1,0 +1,31 @@
+题目描述
+查找排除当前最大、最小salary之后的员工的平均工资avg_salary。
+
+CREATE TABLE `salaries` ( `emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`from_date`));
+
+输出格式:
+avg_salary
+69462.5555555556 
+
+解析：
+
+本题逻辑有问题，在挑选当前最大、最小salary时没加 to_date = '9999-01-01' 作条件限制，
+导致挑选出来的是全表最大、最小salary，然后对除去这两个salary再作条件限制 to_date = '9999-01-01' ，
+求平均薪水，此时求出的平均薪水与题目逻辑要求的不同。 
+
+SELECT AVG(salary) AS avg_salary FROM salaries 
+WHERE to_date = '9999-01-01' 
+AND salary NOT IN (SELECT MAX(salary) FROM salaries)
+AND salary NOT IN (SELECT MIN(salary) FROM salaries)
+
+正确的逻辑应如下所示，但在本题OJ系统中通不过： 
+
+SELECT AVG(salary) AS avg_salary FROM salaries 
+WHERE to_date = '9999-01-01' 
+AND salary NOT IN (SELECT MAX(salary) FROM salaries WHERE to_date = '9999-01-01')
+AND salary NOT IN (SELECT MIN(salary) FROM salaries WHERE to_date = '9999-01-01')
+

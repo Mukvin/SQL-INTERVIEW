@@ -1,0 +1,27 @@
+题目描述
+
+给出每个员工每年薪水涨幅超过5000的员工编号emp_no、薪水变更开始日期from_date以及薪水涨幅值salary_growth，并按照salary_growth逆序排列。
+提示：在sqlite中获取datetime时间对应的年份函数为strftime('%Y', to_date)
+
+CREATE TABLE `salaries` (
+`emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`from_date`));
+
+解析：
+
+
+本题的难点在于如何理解 每年薪水涨幅，以及复用salaries表求出每年薪水涨幅超过5000的员工，具体思路如下：
+1、假设s1是涨薪水前的表，s2是涨薪水后的表，因为每个员工涨薪水的时间不全固定，有可能一年涨两次，有可能两年涨一次，所以每年薪水的涨幅，应该理解为两条薪水记录的from_date相同或to_date相同。
+
+/** 如果只限定to_date相同，则将第三条原始测试数据的52668改成62668时，就会少一条【62668-48584=14084】的记录
+
+INSERT INTO salaries VALUES(10008,46671,'1998-03-11','1999-03-11');
+INSERT INTO salaries VALUES(10008,48584,'1999-03-11','2000-03-10');
+INSERT INTO salaries VALUES(10008, 62668 ,'2000-03-10','2000-07-31');  **/
+
+2、找到s1与s2符合要求的记录后，用s2的薪水减去s1的薪水，用salary_growth表示，加上限定条件 s1.emp_no = s2.emp_no AND salary_growth > 5000，即同一员工每年涨幅超过5000的记录
+
+3、最后依次输出emp_no、from_date、salary_growth，并以salary_growth逆序排列 

@@ -1,0 +1,46 @@
+题目描述
+
+对于employees表中，给出奇数行的first_name
+
+CREATE TABLE `employees` (
+`emp_no` int(11) NOT NULL,
+`birth_date` date NOT NULL,
+`first_name` varchar(14) NOT NULL,
+`last_name` varchar(16) NOT NULL,
+`gender` char(1) NOT NULL,
+`hire_date` date NOT NULL,
+PRIMARY KEY (`emp_no`));
+
+
+输出格式:
+
+first_name
+Georgi
+Chirstian
+Anneke 
+
+解析：
+
+
+首先题目的叙述有问题，导致理解有误，输出的数据与参考答案不同。先给出正确的题目叙述：
+【对于employees表，在对first_name进行排名后，选出奇数排名对应的first_name】。
+
+1、本题用到了三层 SELECT 查询，为了便于理解，采用缩进方式分层，且最外层对应e1，最内层对应e3；
+
+2、在e3层中，采用 COUNT() 函数对 e2.first_name 进行排名标号，即在给定 e2.first_name的情况下，
+不大于 e2.first_name 的 e3.first_name 的个数有多少，该个数刚好与 e2.first_name 的排名标号匹配，且将该值命名为 rowid；
+
+/*注意：排名标号后并未排序，即[Bob, Carter, Amy]的排名是[2,3,1]，选取奇数排名后输出[Carter, Amy]，所以可见参考答案中的first_name并未按字母大小排序*/
+
+3、在e1层中，直接在限定条件 e1.rowid % 2 = 1 下，代表奇数行的 rowid，选取对应的 e1.first_name；
+
+4、e2层则相当于连接e1层（选取表示层）与e3层（标号层）的桥梁。 
+
+答案：
+
+SELECT e1.first_name FROM 
+  (SELECT e2.first_name, 
+    (SELECT COUNT(*) FROM employees AS e3 
+     WHERE e3.first_name <= e2.first_name) 
+   AS rowid FROM employees AS e2) AS e1
+WHERE e1.rowid % 2 = 1

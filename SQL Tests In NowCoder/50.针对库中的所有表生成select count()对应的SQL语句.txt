@@ -1,0 +1,60 @@
+题目描述
+针对库中的所有表生成select count(*)对应的SQL语句
+
+CREATE TABLE `employees` (
+`emp_no` int(11) NOT NULL,
+`birth_date` date NOT NULL,
+`first_name` varchar(14) NOT NULL,
+`last_name` varchar(16) NOT NULL,
+`gender` char(1) NOT NULL,
+`hire_date` date NOT NULL,
+PRIMARY KEY (`emp_no`));
+
+create table emp_bonus(
+emp_no int not null,
+recevied datetime not null,
+btype smallint not null);
+
+CREATE TABLE `dept_emp` (
+`emp_no` int(11) NOT NULL,
+`dept_no` char(4) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`dept_no`));
+
+CREATE TABLE `dept_manager` (
+`dept_no` char(4) NOT NULL,
+`emp_no` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`dept_no`));
+
+CREATE TABLE `salaries` (
+`emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`from_date`));
+
+输出格式:
+	cnts
+	
+select count(*) from employees;
+select count(*) from departments;
+select count(*) from dept_emp;
+select count(*) from dept_manager;
+select count(*) from salaries;
+select count(*) from titles; 
+
+解析：
+
+本题主要有以下两个关键点：
+1、在 SQLite 系统表 sqlite_master 中可以获得所有表的索引，其中字段 name 是所有表的名字，而且对于自己创建的表而言，字段 type 永远是 'table'，详情可参考：
+
+http://blog.csdn.net/xingfeng0501/article/details/7804378
+
+2、在 SQLite 中用 “||” 符号连接字符串 
+
+SELECT "select count(*) from " || name || ";" AS cnts
+FROM sqlite_master WHERE type = 'table'
+

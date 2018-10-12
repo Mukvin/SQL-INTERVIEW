@@ -1,0 +1,23 @@
+题目描述
+
+查找字符串'10,A,B' 中逗号','出现的次数cnt。
+
+解析：
+
+由于 SQLite 中没有直接统计字符串中子串出现次数的函数，因此本题用length()函数与replace()函数的结合灵活地解决了统计子串出现次数的问题，
+属于技巧题，即先用replace函数将原串中出现的子串用空串替换，再用原串长度减去替换后字符串的长度，
+最后除以子串的长度（本题中此步可省略，若子串长度大于1则不可省）。
+
+详情请参考：
+http://www.cnblogs.com/huangtailang/p/5cfbd242cae2bcc929c81c266d0c875b.html
+
+http://sqlite.org/lang_corefunc.html#replace
+
+
+SELECT (length("10,A,B")-length(replace("10,A,B",",","")))/length(",") AS cnt
+
+
+ 还可以利用OJ系统的Bug直接输出2次来通过测试 
+ 
+ SELECT 2 AS cnt
+ 

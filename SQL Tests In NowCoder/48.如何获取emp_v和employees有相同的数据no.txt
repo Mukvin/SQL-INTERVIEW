@@ -1,0 +1,42 @@
+题目描述
+
+存在如下的视图：
+create view emp_v as select * from employees where emp_no >10005;
+如何获取emp_v和employees有相同的数据？
+CREATE TABLE `employees` (
+`emp_no` int(11) NOT NULL,
+`birth_date` date NOT NULL,
+`first_name` varchar(14) NOT NULL,
+`last_name` varchar(16) NOT NULL,
+`gender` char(1) NOT NULL,
+`hire_date` date NOT NULL,
+PRIMARY KEY (`emp_no`));
+
+输出格式:
+
+emp_no 	birth_date 	first_name 	last_name 	gender 	hire_date
+10006 	1953-04-20 	Anneke 		Preusig 	F 		1989-06-02
+10007 	1957-05-23 	Tzvetan 	Zielinski 	F 		1989-02-10
+10008 	1958-02-19 	Saniya 		Kalloufi 	M 		1994-09-15
+10009 	1952-04-19 	Sumant 		Peac 		F 		1985-02-18
+10010 	1963-06-01 	Duangkaew 	Piveteau 	F 		1989-08-24 
+
+解析：
+
+
+由于视图 emp_v 的记录是从 employees 中导出的，所以要判断两者中相等的数据，只需要判断emp_no相等即可。
+方法一：用 WHERE 选取二者 emp_no 相等的记录
+	
+SELECT em.* FROM employees AS em, emp_v AS ev WHERE em.emp_no = ev.emp_no
+方法二：用 INTERSECT 关键字求 employees 和 emp_v 的交集
+
+可参考：http://www.sqlite.org/lang_select.html
+	
+SELECT * FROM employees INTERSECT SELECT * FROM emp_v
+方法三：仔细一想，emp_v的全部记录均由 employees 导出，因此可以投机取巧，直接输出 emp_v 所有记录
+	
+SELECT * FROM emp_v
+【错误方法：】用以下方法直接输出 *，会得到两张表中符合条件的重复记录，因此不合题意，必须在 * 前加表名作限定
+	
+SELECT * FROM employees, emp_v WHERE employees.emp_no = emp_v.emp_no
+

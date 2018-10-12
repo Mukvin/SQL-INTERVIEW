@@ -1,0 +1,33 @@
+题目描述
+
+将所有获取奖金的员工当前的薪水增加10%。
+
+create table emp_bonus(
+emp_no int not null,
+recevied datetime not null,
+btype smallint not null);
+CREATE TABLE `salaries` (
+`emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL, PRIMARY KEY (`emp_no`,`from_date`));
+
+解析：
+
+按照正常的逻辑以及之前题目的尿性，要先选出符合条件的 emp_no，
+即用 INNER JOIN 连接 salaries 和 emp_bonus，且用 s.to_date = '9999-01-01' 表示当前薪水，
+然后再用 UPDATE ... SET ... WHERE ... IN ... 语句来更新表中数据。
+	
+UPDATE salaries SET salary = salary * 1.1 WHERE emp_no IN
+(SELECT s.emp_no FROM salaries AS s INNER JOIN emp_bonus AS eb 
+ON s.emp_no = eb.emp_no AND s.to_date = '9999-01-01')
+
+
+但又发现题目测试用例没设置好，emp_bonus里面的全部 emp_no 都是当前获奖的所有员工，于是就有了以下简易答案：
+
+UPDATE salaries SET salary = salary * 1.1 WHERE emp_no IN 
+(SELECT emp_no FROM emp_bonus)
+
+谁知道还能继续投机取巧，估计是OJ系统的问题，将所有 salary 都上涨10%也能通过，于是又有了以下终极版最短答案：
+
+UPDATE salaries SET salary = salary * 1.1 

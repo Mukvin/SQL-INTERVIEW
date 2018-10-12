@@ -1,0 +1,31 @@
+题目描述
+
+按照salary的累计和running_total，其中running_total为前两个员工的salary累计和，其他以此类推。 具体结果如下Demo展示。
+
+CREATE TABLE `salaries` ( `emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`from_date`));
+
+输出格式:
+emp_no 	salary 	running_total
+10001 	88958 	88958
+10002 	72527 	161485
+10003 	43311 	204796
+10004 	74057 	278853 
+
+解析：
+
+本题的思路为复用 salaries 表进行子查询，最后以 s1.emp_no 排序输出求和结果。
+1、输出的第三个字段，是由一个 SELECT 子查询构成。将子查询内复用的 salaries 表记为 s2，
+主查询的 salaries 表记为 s1，当主查询的 s1.emp_no 确定时，对子查询中不大于 s1.emp_no 的 s2.emp_no 所对应的薪水求和
+
+2、注意是对员工当前的薪水求和，所以在主查询和子查询内都要加限定条件 to_date = '9999-01-01' 
+
+答案：
+
+SELECT s1.emp_no, s1.salary, 
+(SELECT SUM(s2.salary) FROM salaries AS s2 
+ WHERE s2.emp_no <= s1.emp_no AND s2.to_date = '9999-01-01') AS running_total 
+FROM salaries AS s1 WHERE s1.to_date = '9999-01-01' ORDER BY s1.emp_no

@@ -1,0 +1,41 @@
+题目描述
+
+在audit表上创建外键约束，其emp_no对应employees_test表的主键id。
+CREATE TABLE employees_test(
+ID INT PRIMARY KEY NOT NULL,
+NAME TEXT NOT NULL,
+AGE INT NOT NULL,
+ADDRESS CHAR(50),
+SALARY REAL
+);
+
+CREATE TABLE audit(
+EMP_no INT NOT NULL,
+create_date datetime NOT NULL
+);
+
+解析：
+
+本题‘OJ系统太死板，只注重代码形式，不注重代码意义，连代码前缩进四个空格，KEY和(EMP_no)之间除去空格等都规定死了，
+可能是由于OJ系统无法从意义上判断EMP_no是否设置为了 employees_test(ID)的外键所致。
+由于SQLite中不能通过 ALTER TABLE ... ADD FOREIGN KEY ... REFERENCES ... 语句来对已创建好的字段创建外键，
+因此只能先删除表，再重新建表的过程中创建外键。可参考：
+http://www.sqlite.org/foreignkeys.html
+
+https://zhidao.baidu.com/question/350164703.html
+
+答案：
+
+DROP TABLE audit;
+CREATE TABLE audit(
+    EMP_no INT NOT NULL,
+    create_date datetime NOT NULL,
+    FOREIGN KEY(EMP_no) REFERENCES employees_test(ID));
+	
+
+SQLite中设置外键还可以用以下方法： 
+
+DROP TABLE audit;
+CREATE TABLE audit(
+    EMP_no INT NOT NULL REFERENCES employees_test(ID),
+    create_date datetime NOT NULL);

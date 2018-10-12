@@ -1,0 +1,58 @@
+题目描述
+获取所有员工的emp_no、部门编号dept_no以及对应的bonus类型btype和recevied，没有分配具体的员工不显示
+
+CREATE TABLE `dept_emp` ( `emp_no` int(11) NOT NULL,
+`dept_no` char(4) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`dept_no`));
+
+CREATE TABLE `dept_manager` (
+`dept_no` char(4) NOT NULL,
+`emp_no` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`dept_no`));
+
+CREATE TABLE `employees` (
+`emp_no` int(11) NOT NULL,
+`birth_date` date NOT NULL,
+`first_name` varchar(14) NOT NULL,
+`last_name` varchar(16) NOT NULL,
+`gender` char(1) NOT NULL,
+`hire_date` date NOT NULL,
+PRIMARY KEY (`emp_no`));
+
+CREATE TABLE `salaries` (
+`emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`from_date`));
+
+输出格式:
+e.emp_no 	dept_no 		btype 	recevied
+
+10001 		d001 			1 		2010-01-01
+10002 		d001 			2 		2010-10-01
+10003 		d004 			3 		2011-12-03
+10004 		d004 			1 		2010-01-01
+10005 		d003 	
+
+解析：
+
+本题严谨的思路为，先将 employees与dept_emp 用 INNER JOIN 连接，挑选出分配了部门的员工，
+再用 LEFT JOIN 连接 emp_bonus（在前面的题中可看到此表），分配了奖金的员工显示奖金类型和授予时间，没分配奖金的员工则不显示。 
+
+SELECT em.emp_no, de.dept_no, eb.btype, eb.recevied
+FROM employees AS em INNER JOIN dept_emp AS de
+ON em.emp_no = de.emp_no
+LEFT JOIN emp_bonus AS eb 
+ON de.emp_no = eb.emp_no
+
+
+由于dept_emp表中都是已分配部门的员工，因此只用 dept_emp表与emp_bonus表就可以解决问题：
+
+SELECT de.emp_no, de.dept_no, eb.btype, eb.recevied
+FROM dept_emp AS de LEFT JOIN emp_bonus AS eb 
+ON de.emp_no = eb.emp_no

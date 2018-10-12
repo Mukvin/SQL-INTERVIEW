@@ -1,0 +1,68 @@
+题目描述
+
+获取有奖金的员工相关信息。
+
+CREATE TABLE `employees` (
+`emp_no` int(11) NOT NULL,
+`birth_date` date NOT NULL,
+`first_name` varchar(14) NOT NULL,
+`last_name` varchar(16) NOT NULL,
+`gender` char(1) NOT NULL,
+`hire_date` date NOT NULL,
+PRIMARY KEY (`emp_no`));
+
+CREATE TABLE `dept_emp` (
+`emp_no` int(11) NOT NULL,
+`dept_no` char(4) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL,
+PRIMARY KEY (`emp_no`,`dept_no`));
+
+create table emp_bonus(
+emp_no int not null,
+recevied datetime not null,
+btype smallint not null);
+
+CREATE TABLE `salaries` (
+`emp_no` int(11) NOT NULL,
+`salary` int(11) NOT NULL,
+`from_date` date NOT NULL,
+`to_date` date NOT NULL, PRIMARY KEY (`emp_no`,`from_date`));
+
+给出emp_no、first_name、last_name、奖金类型btype、对应的当前薪水情况salary以及奖金金额bonus。 
+bonus类型btype为1其奖金为薪水salary的10%，btype为2其奖金为薪水的20%，其他类型均为薪水的30%。 当前薪水表示to_date='9999-01-01'
+
+输出格式:
+emp_no 	first_name 	last_name 	btype 	salary 	bonus
+10001 	Georgi 	Facello 	1 	88958 	8895.8
+10002 	Bezalel 	Simmel 	2 	72527 	14505.4
+10003 	Parto 	Bamford 	3 	43311 	12993.3 
+
+
+解析：
+
+
+本题主要考查 SQLite 中 CASE 表达式的用法。即当 btype = 1 时，得到 salary * 0.1；
+当 btype = 2 时，得到 salary * 0.2；其他情况得到 salary * 0.3。详细用法请参考：
+http://www.sqlite.org/lang_expr.html 中的【The CASE expression】
+http://www.2cto.com/database/201202/120267.html 中的【条件表达式】 
+
+SELECT e.emp_no, e.first_name, e.last_name, b.btype, s.salary, 
+(CASE b.btype 
+ WHEN 1 THEN s.salary * 0.1
+ WHEN 2 THEN s.salary * 0.2
+ ELSE s.salary * 0.3 END) AS bonus
+FROM employees AS e INNER JOIN emp_bonus AS b ON e.emp_no = b.emp_no
+INNER JOIN salaries AS s ON e.emp_no = s.emp_no AND s.to_date = '9999-01-01'
+
+其实观察测试数据会发现 btype 只有1,2,3三种情况，
+即使不会 CASE 表达式，也能运用四则运算解出：（注意要除以10.0，如果除以10的话，结果的小数位会被舍去）
+
+SELECT e.emp_no, e.first_name, e.last_name, b.btype, s.salary, 
+(s.salary * b.btype / 10.0) AS bonus
+FROM employees AS e INNER JOIN emp_bonus AS b ON e.emp_no = b.emp_no
+INNER JOIN salaries AS s ON e.emp_no = s.emp_no AND s.to_date = '9999-01-01'
+
+
+
+

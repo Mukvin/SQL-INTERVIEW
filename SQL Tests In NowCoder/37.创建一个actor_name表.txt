@@ -1,0 +1,29 @@
+题目描述
+
+对于如下表actor，其对应的数据为:
+
+actor_id 		first_name 			last_name 			last_update
+
+1 				PENELOPE 			GUINESS 		2006-02-15 12:34:33
+2 				NICK 				WAHLBERG 		2006-02-15 12:34:33 
+
+创建一个actor_name表，将actor表中的所有first_name以及last_name导入改表。 actor_name表结构如下：
+
+	列表 			类型 			是否为NULL 		含义
+	
+first_name 		varchar(45) 		not null 		名字
+last_name 		varchar(45) 		not null 		姓氏 
+
+解析：
+
+根据题意，本题要用两条语句完成，先用 CREATE TABLE 语句创建actor_name表，包含first_name与last_name字段，
+然后用 INSERT INTO ... SELECT ... 语句向actor_name表插入另一张表中的数据 
+
+答案：
+
+CREATE TABLE actor_name
+(
+first_name varchar(45) NOT NULL,
+last_name varchar(45) NOT NULL
+);
+INSERT INTO actor_name SELECT first_name, last_name FROM actor;
